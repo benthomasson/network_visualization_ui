@@ -695,6 +695,7 @@ ApplicationScope.prototype.onSnapshot = function (data) {
             this.devices.push(new_device);
             device_map[device.id] = new_device;
             device_interface_map[device.id] = {};
+            if (device.processes) {
             for (j = 0; j < device.processes.length; j++) {
                 process = device.processes[j];
                 new_process = (new app_models.Process(process.id,
@@ -705,6 +706,8 @@ ApplicationScope.prototype.onSnapshot = function (data) {
                 new_process.device = new_device;
                 new_device.processes.push(new_process);
             }
+            }
+            if (device.interfaces) {
             for (j = 0; j < device.interfaces.length; j++) {
                 intf = device.interfaces[j];
                 new_intf = (new net_models.Interface(intf.id,
@@ -713,10 +716,12 @@ ApplicationScope.prototype.onSnapshot = function (data) {
                 device_interface_map[device.id][intf.id] = new_intf;
                 new_device.interfaces.push(new_intf);
             }
+            }
         }
 
         //Build the links
         var link = null;
+        if (data.links) {
         for (i = 0; i < data.links.length; i++) {
             link = data.links[i];
             if (max_link_id === null || link.id > max_link_id) {
@@ -732,9 +737,11 @@ ApplicationScope.prototype.onSnapshot = function (data) {
             device_interface_map[link.from_device_id][link.from_interface_id].link = new_link;
             device_interface_map[link.to_device_id][link.to_interface_id].link = new_link;
         }
+        }
 
         //Build the groups
         var group = null;
+        if (data.groups) {
         for (i = 0; i < data.groups.length; i++) {
             group = data.groups[i];
             if (max_group_id === null || group.id > max_group_id) {
@@ -755,6 +762,7 @@ ApplicationScope.prototype.onSnapshot = function (data) {
                 }
             }
             this.groups.push(new_group);
+        }
         }
 
         //Update group membership
